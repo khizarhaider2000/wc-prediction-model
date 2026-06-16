@@ -146,8 +146,8 @@ def predict_match_from_strength_diff(
     # Draw probability decreases slightly when teams are far apart
     draw_prob = 0.22 - min(abs(adjusted_diff) * 0.06, 0.04)
 
-    team_a_win_prob = max(0.08, min(0.78, team_a_win_prob))
-    team_b_win_prob = max(0.08, min(0.78, team_b_win_prob))
+    team_a_win_prob = max(0.06, min(0.78, team_a_win_prob))
+    team_b_win_prob = max(0.06, min(0.78, team_b_win_prob))
     draw_prob = max(0.18, min(0.28, draw_prob))
 
     total = team_a_win_prob + draw_prob + team_b_win_prob
