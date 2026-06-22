@@ -48,12 +48,14 @@ OUTPUT_COLUMNS = [
     "recent_form_diff",
     "goals_for_last_10_diff",
     "goals_against_last_10_diff",
+    "goal_diff_last_10_diff",
     "strength_gap",
     "host_advantage_diff",
     "result",
     "team_a_win",
     "draw",
     "team_b_win",
+    
 ]
 
 
@@ -158,11 +160,29 @@ def build_match_row(
     goals_against_last_10_diff = float(
         team_b_features["goals_against_last_10"]
     ) - float(team_a_features["goals_against_last_10"])
-    strength_gap = (
-        recent_form_diff
-        + goals_for_last_10_diff * 0.1
-        + goals_against_last_10_diff * 0.1
+    
+    team_a_goal_diff_last_10 = (
+    float(team_a_features["goals_for_last_10"])
+    - float(team_a_features["goals_against_last_10"])
+)
+
+    team_b_goal_diff_last_10 = (
+        float(team_b_features["goals_for_last_10"])
+        - float(team_b_features["goals_against_last_10"])
     )
+
+    goal_diff_last_10_diff = team_a_goal_diff_last_10 - team_b_goal_diff_last_10
+    
+    strength_gap = (
+        abs(recent_form_diff)
+        + abs(goals_for_last_10_diff)
+        + abs(goals_against_last_10_diff)
+    )
+    host_advantage_diff = 0.0
+
+    if not bool(match_row["neutral"]):
+        if str(match_row["home_team"]).lower() == str(match_row["country"]).lower():
+            host_advantage_diff = 1.0
 
     return (
         {
@@ -179,11 +199,13 @@ def build_match_row(
             "goals_for_last_10_diff": goals_for_last_10_diff,
             "goals_against_last_10_diff": goals_against_last_10_diff,
             "strength_gap": strength_gap,
-            "host_advantage_diff": 0.0,
+            "host_advantage_diff": host_advantage_diff,
             "result": result,
             "team_a_win": int(result == "team_a_win"),
             "draw": int(result == "draw"),
+            "goal_diff_last_10_diff": goal_diff_last_10_diff,
             "team_b_win": int(result == "team_b_win"),
+            
         },
         [],
     )
