@@ -48,6 +48,7 @@ OUTPUT_COLUMNS = [
     "recent_form_diff",
     "goals_for_last_10_diff",
     "goals_against_last_10_diff",
+    "strength_gap",
     "host_advantage_diff",
     "result",
     "team_a_win",
@@ -148,6 +149,21 @@ def build_match_row(
     team_b_goals = int(match_row["away_score"])
     result = get_result_label(team_a_goals, team_b_goals)
 
+    recent_form_diff = float(team_a_features["recent_form"]) - float(
+        team_b_features["recent_form"]
+    )
+    goals_for_last_10_diff = float(team_a_features["goals_for_last_10"]) - float(
+        team_b_features["goals_for_last_10"]
+    )
+    goals_against_last_10_diff = float(
+        team_b_features["goals_against_last_10"]
+    ) - float(team_a_features["goals_against_last_10"])
+    strength_gap = (
+        recent_form_diff
+        + goals_for_last_10_diff * 0.1
+        + goals_against_last_10_diff * 0.1
+    )
+
     return (
         {
             "date": match_row["date"],
@@ -159,14 +175,10 @@ def build_match_row(
             "neutral": match_row["neutral"],
             "elo_diff": 0.0,
             "fifa_rank_diff": 0.0,
-            "recent_form_diff": float(team_a_features["recent_form"])
-            - float(team_b_features["recent_form"]),
-            "goals_for_last_10_diff": float(team_a_features["goals_for_last_10"])
-            - float(team_b_features["goals_for_last_10"]),
-            "goals_against_last_10_diff": float(
-                team_b_features["goals_against_last_10"]
-            )
-            - float(team_a_features["goals_against_last_10"]),
+            "recent_form_diff": recent_form_diff,
+            "goals_for_last_10_diff": goals_for_last_10_diff,
+            "goals_against_last_10_diff": goals_against_last_10_diff,
+            "strength_gap": strength_gap,
             "host_advantage_diff": 0.0,
             "result": result,
             "team_a_win": int(result == "team_a_win"),
